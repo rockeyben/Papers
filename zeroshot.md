@@ -35,8 +35,16 @@ target: (images, labels)
 
 举个例子，假设car是一个未知类，在source domain中，我们可能可以根据他的一些属性（例如“有轮胎”，“运输工具”）等等，发现它可以由truck和boat两个类表出；在target domain中，我们可能也可以根据视觉feature判断出它可以由truck、boat这两个类表出，最后拿两个domain各自生成的直方图进行比较，找出最相似的那个类，我们就可以得到未知类的类别了。所以我们的目标是给出source domain的属性向量$c$以及target domain的图片$x$，我们能够把他们表示为一个由所有已知类构成的直方图$\Delta$。
 
-这里有一个假设，就是同一个class基于source与target domain得到的直方图应该是类似的，不能说根据属性，我得到的是“DOG=CAT+HORSE”，而根据视觉特征我得到的是“DOG=WOLF+LION”，这样这个方法就会不work了。
-
-
-
 ![image](figures/SSE_1.png)
+
+
+
+论文里的符号系统比较复杂，比较重要的一点是：$z$和$\pi$。$\pi$代表target domain(image)那一边的直方图，$z$代表source domain(attribute)那一边的直方图，两者说的是同一个东西。可以通过式子(6)看到，作者对样本x是否属于类别y的评分score的定义：$f(x,y)$，这个也是由source与target两个domain共同决定的。其中每一项的内积的部分代表在视觉feature层面，样本x属于已知类$s$的程度。再乘上一个权重$z_{y,s}$，代表在source domain，也就是attribute层面，未知类别$y$可由已知类$s$表达的程度。需要注意的是，$z_{y,s}$是在test的时候才给出来的。
+
+![image](figures/SSE_2.png)
+
+这里有一个假设，就是同一个class基于source与target domain得到的直方图应该是类似的，不能说根据属性，我得到的是“DOG=CAT+HORSE”，而根据视觉特征我得到的是“DOG=WOLF+LION”，这样这个方法就会不work了。这个假设会用一个约束来实现，也就是式(2)。根据之前的解释我们关注这两个符号$z$和$\pi$，分别代表source与target domain里对某个未知类别$y$的直方图表述，这个式子很明显就是强迫相同label在两个domain里的表述应该是最一致的（平均来看）。这个约束会在最后的优化目标函数里有所体现，也就是式(8)。
+
+![image](figures/SSE_4.png)
+
+![image](figures/SSE_3.png)
